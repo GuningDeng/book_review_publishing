@@ -1,0 +1,35 @@
+.wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    position: fixed;
+    height: 100vh;
+    z-index: 100;
+}
+
+.content {
+    flex-grow: 1;
+    /* margin-left: 280px; */
+    padding: 20px;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+.navbar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 280px;
+    z-index: 99;
+}
+
+@media (max-width: 991.98px) {
+    .content { margin-left: 0 !important; }
+    .sidebar { position: fixed; height: 100vh; z-index: 1000; transition: 0.3s; }
+    .sidebar.show { display: block !important; }
+}
+.sidebar { position: fixed; height: 100vh; }
