@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin books</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            background-color: #212529;
+            min-height: 100vh;
+            color: white;
+            padding-top: 20px;
+        }
+        .sidebar .nav-link {
+            color: #fff;
+            padding: 10px 20px;
+            margin: 5px 0;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: #0d6efd;
+            border-radius: 5px;
+        }
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        .admin-profile {
+            padding: 15px 20px;
+            border-top: 1px solid #444;
+            margin-top: 20px;
+        }
+        .admin-profile img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <p class="text-uppercase text-center text-white mb-2">Book Review Publishing System</p>
+                <hr class="sidebar-divider">
+                <h4 class="mb-4 ps-3">Admin Books</h4>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/admin/view/index"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                    <a class="nav-link" href="#"><i class="bi bi-plus-circle"></i> Add Article</a>
+                    <a class="nav-link" href="#"><i class="bi bi-file-text"></i> Articles</a>
+                    <a class="nav-link" href="#"><i class="bi bi-list-ul"></i> Geners</a>
+                    <a class="nav-link active" href="#"><i class="bi bi-book"></i> Books</a>
+                    <a class="nav-link" href="/admin/view/author/allByConditions?pageNum=0&pageSize=10&sortField=id&sortDirection=asc"><i class="bi bi-people"></i> Authors</a>
+                    <a class="nav-link" href="#"><i class="bi bi-gear"></i> Settings</a>
+                </nav>
+                <div class="admin-profile">
+                    <div class="d-flex align-items-center">
+                        <img src="https://github.com/mdo.png" alt="Admin" class="me-2">
+                        <div class="dropdown">
+                            <button class="btn btn-link text-white text-decoration-none dropdown-toggle" type="button" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Admin
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                <li><a class="dropdown-item" href="#">Profile</a></li>
+                                <li><a class="dropdown-item" href="#">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <h2 class="mb-4">Overview - books</h2>
+                
+                <!-- Statistics Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card bg-primary text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-title">Total books</h6>
+                                        <h3 class="mb-0" th:text="${bookCount}"></h3>
+                                    </div>
+                                    <i class="bi bi-book"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card bg-success text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-title">Published books</h6>
+                                        <h3 class="mb-0" th:text="${books.totalElements}"></h3>
+                                    </div>
+                                    <i class="bi bi-book-half"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card bg-info text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-title">Active Authors</h6>
+                                        <h3 class="mb-0" th:text="${authorCount}"></h3>
+                                    </div>
+                                    <i class="bi bi-people"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card bg-warning text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-title">Genres</h6>
+                                        <!-- <h3 class="mb-0" th:text="${bookGenreCount}"></h3> -->
+                                    </div>
+                                    <i class="bi bi-list-ul"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="filter-section mb-3">
+                    <form th:action="@{/admin/view/book/findBooksByFilters}" method="get" id="filterForm" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="titleFilter" class="form-label">Book name(partial match)</label>
+                            <input type="text" class="form-control" name="bookName" id="bookNameFilter" th:value="${param.bookName}" placeholder="Search by book name">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="bookISBNFilter" class="form-label">ISBN(exact match)</label>
+                            <input type="text" class="form-control" name="bookISBN" id="bookISBNFilter" th:value="${param.bookISBN}" placeholder="Search by book ISBN">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="bookASINFilter" class="form-label">ASIN(exact match)</label>
+                            <input type="text" class="form-control" name="bookASIN" id="bookASINFilter" th:value="${param.bookASIN}" placeholder="Search by book ASIN">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="bookDescriptionFilter" class="form-label">Book description(partial match)</label>
+                            <input type="text" class="form-control" name="bookDescription" id="bookDescriptionFilter" th:value="${param.bookDescription}" placeholder="Search by book description">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="languageNameFilter" class="form-label">Language(partial match)</label>
+                            <input type="text" class="form-control" name="languageName" id="languageName" th:value="${param.languageName}" placeholder="Search by book language">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="publishYearFilter" class="form-label">Publish year(exact match)</label>
+                            <input type="number" min="1900" max="2020" class="form-control" name="publishYear" id="publishYearFilter" th:value="${param.publishYear}" placeholder="Publish year since: 1900">
+                            
+                        </div>
+                        <div class="col-md-3">
+                            <label for="isPublishedFilter" class="form-label">Status</label>
+                            <select class="form-select" id="isPublishedFilter" name="isPublished" th:value="${param.isPublished}">
+                                <option value="">Status</option>
+                                <option value="0" th:selected="${param.isPublished == 0}">Unpublished</option>
+                                <option value="1" th:selected="${param.isPublished == 1}">Published</option>
+                                <!-- <option value="archived">Archived</option> -->
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Apply Filters</button>
+                            <!-- <button type="reset" class="btn btn-secondary ms-2">Reset</button> -->
+                            <a href="/admin/view/book/findBooksByFilters?pageNum=0&pageSize=10&sortField=id&sortDirection=asc" class="btn btn-secondary ms-2">Reset</a>
+                        </div>
+                        <input type="hidden" name="pageNum" id="pageNum" th:value="${pageNum}">
+                        <input type="hidden" name="sortField" id="sortField" th:value="${param.sortField}">
+                        <input type="hidden" name="sortDirection" id="sortDirection" th:value="${param.sortDirection}">
+                    </form>
+                    
+                </div>
+                <div class="mb-5"></div>
+                <!-- Books -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="#" id="idLink">ID</a>
+                                    <span class="sort-icon" th:if="${sortField == 'id'}">
+                                        <i th:class="${sortDirection == 'asc'? 'bi bi-sort-up' : 'bi bi-sort-down'}"></i>
+                                    </span>
+                                </th>
+                                <th>
+                                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="#" id="bookNameLink">Book name</a>
+                                    <span class="sort-icon" th:if="${sortField == 'bookName'}">
+                                        <i th:class="${sortDirection == 'asc'? 'bi bi-sort-up' : 'bi bi-sort-down'}"></i>
+                                    </span>
+                                </th>
+                                <th>Author IDs</th>
+                                <th>ISBN</th>
+                                <th>ASIN</th>
+                                <th>Gener IDs</th>
+                                <th>
+                                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="#" id="languageNameLink">Language</a>
+                                    <span class="sort-icon" th:if="${sortField == 'languageName'}">
+                                        <i th:class="${sortDirection == 'asc'? 'bi bi-sort-up' : 'bi bi-sort-down'}"></i>
+                                    </span>
+                                </th>
+                                <th>
+                                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="#" id="publisherNameLink">Publisher</a>
+                                    <span class="sort-icon" th:if="${sortField == 'publisher'}">
+                                        <i th:class="${sortDirection == 'asc'? 'bi bi-sort-up' : 'bi bi-sort-down'}"></i>
+                                    </span>
+                                </th>
+                                <th>
+                                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="#" id="publishYearLink">Publish year</a>
+                                    <span class="sort-icon" th:if="${sortField == 'publishYear'}">
+                                        <i th:class="${sortDirection == 'asc'? 'bi bi-sort-up' : 'bi bi-sort-down'}"></i>
+                                    </span>
+                                </th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(books)}">
+                                <td colspan="10" class="text-center">No books found</td>
+                            </tr>
+                            <tr th:each="book : ${books.content}">
+                                <td><a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" th:href="@{/admin/view/book/{id}(id = ${book.id})}"><span th:text="${book.id}"></span></a></td>
+                                <td th:text="${book.bookName}"></td>
+                                <td th:text="${#strings.arrayJoin(book.bookAuthorIds, ', ')}"></td>
+                                <td th:text="${book.bookISBN}"></td>
+                                <td th:text="${book.bookASIN}"></td>
+                                <td th:text="${#strings.arrayJoin(book.bookGenreIds, ', ')}"></td>
+                                <td th:text="${book.languageName}"></td>
+                                <td th:text="${book.publisher}"></td>
+                                <td th:text="${book.publishYear}"></td>
+                                <td><span th:class="${book.isPublished == 0 ? 'badge bg-warning' : 'badge bg-success'}" th:text="${book.isPublished == 0 ? 'Unpublished' : 'Published'}"></span></td>                                
+                            </tr>                            
+                        </tbody>
+                    </table>
+                </div>  
+            
+                <!-- Pagination -->
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:if="${books.hasPrevious()}">
+                            <a class="page-link" th:href="@{'/admin/view/book/findBooksByFilters'(pageNum=${books.number - 1},sortField=${param.sortField},sortDirection=${param.sortDirection},bookName=${param.bookName},bookDescription=${param.bookDescription},languageName=${param.languageName},publisher=${param.publisher},publishYear=${param.publishYear},isPublished=${param.isPublished})}" aria-label="Previous">
+                                <span aria-hidden="true">Previous</span>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, books.totalPages - 1)}" th:classappend="${i == books.number} ? 'active' : ''">
+                            <a class="page-link" th:href="@{'/admin/view/book/findBooksByFilters'(pageNum=${i},sortField=${param.sortField},sortDirection=${param.sortDirection},bookName=${param.bookName},bookDescription=${param.bookDescription},languageName=${param.languageName},publisher=${param.publisher},publishYear=${param.publishYear},isPublished=${param.isPublished})}" th:text="${i + 1}"></a>
+                        </li>
+                        <li class="page-item" th:if="${books.hasNext()}">
+                            <a class="page-link" th:href="@{'/admin/view/book/findBooksByFilters'(pageNum=${books.number + 1},sortField=${param.sortField},sortDirection=${param.sortDirection},bookName=${param.bookName},bookDescription=${param.bookDescription},languageName=${param.languageName},publisher=${param.publisher},publishYear=${param.publishYear},isPublished=${param.isPublished})}" aria-label="Next">
+                                <span aria-hidden="true">Next</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // intitialize pathparam
+        const pathParametersMap = new Map();
+        const currentUrl = new URL(window.location.href);
+        const params = new URLSearchParams(currentUrl.search);
+        var sortDirection = params.get('sortDirection') === "asc"? "desc" : "asc";
+        params.set('sortDirection', sortDirection);
+
+        const idLink = document.getElementById('idLink');
+        var paramsIDURL = params;
+        paramsIDURL.set('sortField', 'id');
+        idLink.href = `${currentUrl.pathname}?${paramsIDURL.toString()}`;
+        console.log("idLink url: " + idLink.href);
+
+        const bookNameLink = document.getElementById('bookNameLink');
+        var paramsBookNameURL = params;
+        paramsBookNameURL.set('sortField', 'bookName');
+        bookNameLink.href = `${currentUrl.pathname}?${paramsBookNameURL.toString()}`;
+        console.log("bookNameLink url: " + bookNameLink.href);
+
+        const languageNameLink = document.getElementById('languageNameLink');
+        var paramsLanguageNameURL = params;
+        paramsLanguageNameURL.set('sortField', 'languageName');
+        languageNameLink.href = `${currentUrl.pathname}?${paramsLanguageNameURL.toString()}`;
+        console.log("languageNameLink url: " + languageNameLink.href);
+
+        const publisherNameLink = document.getElementById('publisherNameLink');
+        var paramsPublisherNameURL = params;
+        paramsPublisherNameURL.set('sortField', 'publisher');
+        publisherNameLink.href = `${currentUrl.pathname}?${paramsPublisherNameURL.toString()}`;
+        console.log("publisherNameLink url: " + publisherNameLink.href);
+
+        const publishYearLink = document.getElementById('publishYearLink');
+        var paramsPublishYearURL = params;
+        paramsPublishYearURL.set('sortField', 'publishYear');
+        publishYearLink.href = `${currentUrl.pathname}?${paramsPublishYearURL.toString()}`;
+        console.log("publishYearLink url: " + publishYearLink.href);
+
+    </script>
+    
+</body>
+</html>

@@ -3,9 +3,11 @@ package com.deng.book_review_publishing.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.deng.book_review_publishing.entity.Author;
 
@@ -60,4 +62,16 @@ public interface AuthorRepository extends JpaRepository<Author, Long> {
      */
     @Query(value = "SELECT DISTINCT a FROM Author a")
     public Page<Author> findAllPage(Pageable pageable);
+
+    
+    /**
+     * Batch inactivate authors by setting their status to inactive (1)
+     * 
+     * @param ids Array of author IDs to inactivate
+     * @return number of authors updated
+     */
+    @Modifying
+    @Transactional
+    @Query("UPDATE Author a SET a.authorStatus = 1 WHERE a.id IN :ids")
+    public int inactiveBatch(@Param("ids") Long[] ids);
 }

@@ -16,7 +16,10 @@ import org.slf4j.LoggerFactory;
 import com.deng.book_review_publishing.entity.Author;
 import com.deng.book_review_publishing.entity.ErrorResponse;
 import com.deng.book_review_publishing.service.AuthorService;
+import com.deng.book_review_publishing.utils.ValidateUtil;
+
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 
 
@@ -41,16 +44,17 @@ public class AuthorController {
         try {
             logger.debug("Fetching active authors with pageNum: {}, pageSize: {}, sortField: {}, sortDirection: {}",
                 pageNum, pageSize, sortField, sortDirection);
-
+            // Validate pageNum and pageSize
+            pageNum = ValidateUtil.validatePaginationParamPageNum(pageNum, 0);
+            // Validate pageSize
+            pageSize = ValidateUtil.validatePaginationParamPageSize(pageSize, 10, 100);
             // Validate sort field
-            if (!Arrays.asList("id", "firstName", "lastName", "countryName").contains(sortField)) {
-                logger.warn("Invalid sort field: {}", sortField);
-                return ResponseEntity.badRequest()
-                    .body(new ErrorResponse("Invalid sort field", HttpStatus.BAD_REQUEST));
-            }
+            sortField = ValidateUtil.validateAndNormalizeSortField(sortField, new String[]{"id", "firstName", "countryName"}, "id");
+            // Validate sort direction
+            sortDirection = ValidateUtil.validateAndNormalizeSortDirection(sortDirection);
 
             Page<Author> authors = authorService.findAllActiveAuthors(pageNum, pageSize, sortField, sortDirection);
-            
+
             if (authors.isEmpty()) {
                 logger.info("No active authors found");
                 return ResponseEntity.ok()
@@ -79,15 +83,16 @@ public class AuthorController {
         try {
             logger.debug("Fetching all authors with pageNum: {}, pageSize: {}, sortField: {}, sortDirection: {}",
                 pageNum, pageSize, sortField, sortDirection);
-
+            // Validate pageNum and pageSize
+            pageNum = ValidateUtil.validatePaginationParamPageNum(pageNum, 0);
+            // Validate pageSize
+            pageSize = ValidateUtil.validatePaginationParamPageSize(pageSize, 10, 100);
             // Validate sort field
-            if (!Arrays.asList("id", "firstName", "lastName", "countryName").contains(sortField)) {
-                logger.warn("Invalid sort field: {}", sortField);
-                return ResponseEntity.badRequest()
-                    .body(new ErrorResponse("Invalid sort field", HttpStatus.BAD_REQUEST));
-            }
+            sortField = ValidateUtil.validateAndNormalizeSortField(sortField, new String[]{"id", "firstName", "countryName"}, "id");
+            // Validate sort direction
+            sortDirection = ValidateUtil.validateAndNormalizeSortDirection(sortDirection);
 
-            Page<Author> authors = authorService.findAll(pageNum, pageSize, sortField, sortDirection);
+            Page<Author> authors = authorService.findAllPage(pageNum, pageSize, sortField, sortDirection);
 
             if (authors.isEmpty()) {
                 logger.info("No authors found");
@@ -121,13 +126,15 @@ public class AuthorController {
         try {
             logger.debug("Fetching authors with conditions: pageNum: {}, pageSize: {}, sortField: {}, sortDirection: {}, firstName: {}, lastName: {}, countryName: {}, gender: {}, status: {}",
                 pageNum, pageSize, sortField, sortDirection, firstName, lastName, countryName, gender, isDeleted, authorStatus);
-
+            // Validate pageNum and pageSize
+            pageNum = ValidateUtil.validatePaginationParamPageNum(pageNum, 0);
+            // Validate pageSize
+            pageSize = ValidateUtil.validatePaginationParamPageSize(pageSize, 10, 100);
             // Validate sort field
-            if (!Arrays.asList("id", "firstName", "lastName", "countryName").contains(sortField)) {
-                logger.warn("Invalid sort field: {}", sortField);
-                return ResponseEntity.badRequest()
-                   .body(new ErrorResponse("Invalid sort field", HttpStatus.BAD_REQUEST));
-            }
+            sortField = ValidateUtil.validateAndNormalizeSortField(sortField, new String[]{"id", "firstName", "countryName"}, "id");
+            // Validate sort direction
+            sortDirection = ValidateUtil.validateAndNormalizeSortDirection(sortDirection);
+            System.out.println("lastName: " + lastName);
 
             Page<Author> authors = authorService.findAllByConditions(pageNum, pageSize, sortField, sortDirection, firstName, lastName, countryName, gender, isDeleted, authorStatus); 
             if (authors.isEmpty()) {
@@ -146,9 +153,14 @@ public class AuthorController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getMethodName(@PathVariable Long id) {
+    public ResponseEntity<?> getAuthorById(@PathVariable Long id) {
         try {
             logger.debug("Fetching author with id: {}", id);
+            if (id == null) {
+                logger.warn("Invalid author id provided");
+                return ResponseEntity.badRequest()
+                   .body(new ErrorResponse("Invalid author id", HttpStatus.BAD_REQUEST));    
+            }
             Author author = authorService.findById(id);
             if (author == null) {
                 logger.warn("Author with id: {} not found", id);
@@ -162,12 +174,23 @@ public class AuthorController {
                 .body(new ErrorResponse("Error fetching author", HttpStatus.INTERNAL_SERVER_ERROR));
         }
     }
-    
 
+    /**
+     * Update the isDeleted status of an author by ID.
+     *
+     * @param id        The ID of the author to update.
+     * @param isDeleted The new isDeleted status (0 or 1).
+     * @return ResponseEntity with the updated author or an error message.
+     */
     @PutMapping("/{id}/isDeleted")
     public ResponseEntity<?> updateIsDeletedById(@PathVariable Long id, @RequestParam(defaultValue = "0") Byte isDeleted) {
         try {
             logger.debug("Updating isDeleted status for author with id: {} to {}", id, isDeleted);
+            if (id == null) {
+                logger.warn("Invalid author id provided");
+                return ResponseEntity.badRequest()
+                  .body(new ErrorResponse("Invalid author id", HttpStatus.BAD_REQUEST));    
+            }
             Author author = authorService.findById(Long.valueOf(id));
             if (author == null) {
                 logger.warn("Author with id: {} not found", id);
@@ -195,6 +218,33 @@ public class AuthorController {
                 .body(new ErrorResponse("Error updating author", HttpStatus.INTERNAL_SERVER_ERROR));
         }
         
+    }
+
+    @PutMapping("/batch/inactive")
+    public ResponseEntity<?> inactiveBatchByIds(@RequestBody Long[] ids) {
+        try {
+            logger.debug("Inactivating authors with ids: {}", Arrays.toString(ids));
+            if (ids == null || ids.length == 0) {
+                logger.warn("Invalid author ids provided");
+                return ResponseEntity.badRequest()
+                    .body(new ErrorResponse("Invalid author ids", HttpStatus.BAD_REQUEST));
+            }
+
+            Boolean result = authorService.inactiveBatch(ids);
+            if (result) {
+                logger.info("Authors with ids: {} have been inactivated", Arrays.toString(ids));
+                return ResponseEntity.ok()
+                    .body(new ErrorResponse("Authors have been successfully inactivated", HttpStatus.OK));
+            } else {
+                logger.warn("Failed to inactivate some or all authors with ids: {}", Arrays.toString(ids));
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Failed to inactivate some or all authors", HttpStatus.INTERNAL_SERVER_ERROR));
+            }
+        } catch (Exception e) {
+            logger.error("Error inactivating authors with ids: {}", Arrays.toString(ids), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("Error inactivating authors", HttpStatus.INTERNAL_SERVER_ERROR));
+        }
     }
 }
 

@@ -18,7 +18,11 @@ public interface AuthorService {
 
     public Page<Author> findAllActiveAuthors(int pageNum, int pageSize, String sortField, String sortDirection);
 
-    public Page<Author> findAll(int pageNum, int pageSize, String sortField, String sortDirection);
+    public Page<Author> findAllPage(int pageNum, int pageSize, String sortField, String sortDirection);
+
+    public Page<Author> findAllByStatus(int pageNum, int pageSize, String sortField, String sortDirection, Byte authorStatus);
+
+    public Boolean inactiveBatch(Long[] ids);
 }
 
 

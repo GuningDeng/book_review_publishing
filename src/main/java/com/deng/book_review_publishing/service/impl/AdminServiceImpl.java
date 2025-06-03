@@ -33,7 +33,6 @@ public class AdminServiceImpl implements AdminService {
             log.error("Error finding admin by ID {}: {}", id, e.getMessage());
             throw new RuntimeException("Error finding admin", e);
         }
-        // return adminRepository.findById(id).orElseThrow(() -> new RuntimeException("Admin not found"));
     }
 
     @Override

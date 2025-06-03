@@ -1,16 +1,16 @@
 package com.deng.book_review_publishing.entity.enums;
 
-public enum Language {
-    ENGLISH("English", "EN", "English Language"), 
+public enum Language {     
+    ARABIC("Arabic", "AR", "Arabic Language"),
     CHINESE("Chinese", "CN", "Chinese Language"), 
+    ENGLISH("English", "EN", "English Language"),
+    FRENCH("French", "FR", "French Language"),
+    GERMAN("German", "DE", "German Language"),
+    ITALIAN("Italian", "IT", "Italian Language"),
     JAPANESE("Japanese", "JP", "Japanese Language"), 
-    SPANISH("Spanish", "SP", "Spanish Language"), 
-    GERMAN("German", "DE", "German Language"), 
-    FRENCH("French", "FR", "French Language"), 
-    ITALIAN("Italian", "IT", "Italian Language"), 
-    RUSSIAN("Russian", "RU", "Russian Language"), 
-    ARABIC("Arabic", "AR", "Arabic Language");    
-    
+    RUSSIAN("Russian", "RU", "Russian Language"),
+    SPANISH("Spanish", "SP", "Spanish Language");    
+     
     private final String displayName;
     private final String code;
     private final String description;
