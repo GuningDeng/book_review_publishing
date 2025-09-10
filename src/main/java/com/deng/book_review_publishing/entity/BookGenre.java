@@ -34,21 +34,13 @@ public class BookGenre {
     @Column(name = "create_time")
     private Date createTime;
 
-    
+    @Column(name = "created_by_admin_id")
+    private Long createdByAdminId;
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", id=").append(id);
-        sb.append(", categoryName=").append(genreName);
-        sb.append(", isDeleted=").append(isDeleted);
-        sb.append(", createTime=").append(createTime);
-        sb.append("]");
-        return sb.toString();
-    }
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Europe/Brussels")
+    @Column(name = "updated_time")
+    private Date updatedTime;
+    
 
     public Long getId() {
         return id;
@@ -88,6 +80,38 @@ public class BookGenre {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public Long getCreatedByAdminId() {
+        return createdByAdminId;
+    }
+
+    public void setCreatedByAdminId(Long createdByAdminId) {
+        this.createdByAdminId = createdByAdminId;
+    }
+
+    public Date getUpdatedTime() {
+        return updatedTime;
+    }
+
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getSimpleName());
+        sb.append(" [");
+        sb.append("Hash = ").append(hashCode());
+        sb.append(", id=").append(id);
+        sb.append(", categoryName=").append(genreName);
+        sb.append(", isDeleted=").append(isDeleted);
+        sb.append(", createTime=").append(createTime);
+        sb.append(", createdByAdminId=").append(createdByAdminId);
+        sb.append(", updatedTime=").append(updatedTime);
+        sb.append("]");
+        return sb.toString();
     }
     
 }

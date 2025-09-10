@@ -1,7 +1,6 @@
 package com.deng.book_review_publishing.controller.admin.adminView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.deng.book_review_publishing.entity.Author;
 import com.deng.book_review_publishing.entity.Book;
 import com.deng.book_review_publishing.service.AuthorService;
+import com.deng.book_review_publishing.service.BookGenreService;
 import com.deng.book_review_publishing.service.BookService;
 import com.deng.book_review_publishing.utils.ValidateUtil;
 
@@ -26,9 +26,12 @@ public class BookViewController {
     private static final Logger logger = LoggerFactory.getLogger(BookViewController.class);
     private final BookService bookService;
     private final AuthorService authorService;
-    public BookViewController(AuthorService authorService, BookService bookService) {
+    private final BookGenreService bookGenreService;
+    public BookViewController(AuthorService authorService, BookService bookService, BookGenreService bookGenreService) {
         this.authorService = authorService;
         this.bookService = bookService;
+        this.bookGenreService = bookGenreService;
+        logger.debug("BookViewController initialized with services: {}, {}, {}", authorService, bookService, bookGenreService);
     }
 
     @GetMapping("/findBooksByFilters")
@@ -65,6 +68,7 @@ public class BookViewController {
             Page<Book> books = bookService.findBooksByFilters(pageNum, pageSize, sortField, sortDirection, bookName, bookISBN, bookASIN, bookDescription, languageName, publisher, publishYear, isPublished);
             Long bookCount = bookService.count();
             Long authorCount = authorService.countByStatus((byte) 0);
+            Long bookGenreCount = bookGenreService.countBookGenres();
             System.out.println("books TotalPages: " + books.getTotalPages());
             if (books!= null && books.hasContent()) {
                 logger.info("Books found: {}", books.getContent());
@@ -82,6 +86,8 @@ public class BookViewController {
                 model.addAttribute("publishYear", publishYear);
                 // model.addAttribute("isPublished", isPublished);
                 model.addAttribute("authorCount", authorCount);
+                model.addAttribute("bookGenreCount", bookGenreCount);
+                logger.info("Returning view for books with filters applied");
                 return "admin/books";
             } else {
                 logger.info("No books found");

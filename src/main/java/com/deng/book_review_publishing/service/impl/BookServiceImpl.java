@@ -26,7 +26,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public Page<Book> findBooksByFilters(int pageNum, int pageSize, String sortField, String sortDirection, String bookName,
             String bookISBN, String bookASIN, String bookDescription, String languageName, String bookPublisher, Integer publishYear, byte isPublished) {
-                System.out.println("languageName first: " + languageName);
+                
         try {
             // validate parameters
             pageNum = ValidateUtil.validatePaginationParamPageNum(pageNum, 0);

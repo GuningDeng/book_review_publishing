@@ -1,6 +1,9 @@
 package com.deng.book_review_publishing.entity;
 
+import java.util.Date;
+
 import com.deng.book_review_publishing.entity.enums.Country;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,7 +34,22 @@ public class Author {
     private byte authorStatus;
     @Column(name = "author_is_deleted")
     private byte isDeleted;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Europe/Brussels")
+    @Column(name = "create_time")
+    private Date createTime;
+
+    @Column(name = "created_by_admin_id")
+    private Long createdByAdminId;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Europe/Brussels")
+    @Column(name = "updated_time")
+    private Date updatedTime;
+
+    @Column(name = "updated_by_id")
+    private Long updatedById;
     
+
     public Long getId() {
         return Id;
     }
@@ -101,6 +119,44 @@ public class Author {
         this.isDeleted = isDeleted;
     }   
 
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+
+    public Long getCreatedByAdminId() {
+        return createdByAdminId;
+    }
+
+
+    public void setCreatedByAdminId(Long createdByAdminId) {
+        this.createdByAdminId = createdByAdminId;
+    }
+
+
+    public Date getUpdatedTime() {
+        return updatedTime;
+    }
+
+
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
+    }
+
+    public Long getUpdatedById() {
+        return updatedById;
+    }
+
+    public void setUpdatedById(Long updatedById) {
+        this.updatedById = updatedById;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -114,6 +170,10 @@ public class Author {
         sb.append(", countryName=").append(countryName);
         sb.append(", authorStatus=").append(authorStatus);
         sb.append(", isDeleted=").append(isDeleted);
+        sb.append(", createTime=").append(createTime);
+        sb.append(", createdByAdminId=").append(createdByAdminId);
+        sb.append(", updatedTime=").append(updatedTime);
+        sb.append(", updatedById=").append(updatedById);
         sb.append("]");
         return sb.toString();
     }

@@ -17,7 +17,7 @@ public class BookReview {
     @Column(name = "book_id")
     private Long bookId;
     @Column(name = "book_review_author")
-    private String reviewAutho;
+    private String reviewAuthor;
     @Column(name = "book_review_author_id")
     private Long reviewAuthorId;
     @Column(name = "book_review_content")
@@ -33,7 +33,14 @@ public class BookReview {
     @Column(name = "book_review_create_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Europe/Brussels")
     private Date createTime;
+    @Column(name = "book_review_update_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Europe/Brussels")
+    private Date updatedTime;
+    @Column(name = "book_review_update_by_id")
+    private Long updatedBy;
        
+
+
     public Long getId() {
         return id;
     }
@@ -58,14 +65,14 @@ public class BookReview {
 
 
 
-    public String getReviewAutho() {
-        return reviewAutho;
+    public String getReviewAuthor() {
+        return reviewAuthor;
     }
 
 
 
-    public void setReviewAutho(String reviewAutho) {
-        this.reviewAutho = reviewAutho == null? null : reviewAutho.trim();
+    public void setReviewAuthor(String reviewAuthor) {
+        this.reviewAuthor = reviewAuthor == null? null : reviewAuthor.trim();
     }
 
 
@@ -89,7 +96,7 @@ public class BookReview {
 
 
     public void setReviewContent(String reviewContent) {
-        this.reviewContent = reviewContent;
+        this.reviewContent = reviewContent == null? null : reviewContent.trim();
     }
 
 
@@ -152,6 +159,30 @@ public class BookReview {
         this.createTime = createTime;
     }
 
+    public Date getUpdatedTime() {
+        return updatedTime;
+    }
+
+
+
+    public Long getUpdatedBy() {
+        return updatedBy;
+    }
+
+
+
+    public void setUpdatedBy(Long updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+
+
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
+    }
+
+
+
 
     @Override
     public String toString() {
@@ -161,7 +192,7 @@ public class BookReview {
         builder.append(", bookId=");
         builder.append(bookId);
         builder.append(", reviewAutho=");
-        builder.append(reviewAutho);
+        builder.append(reviewAuthor);
         builder.append(", reviewAuthorId=");
         builder.append(reviewAuthorId);
         builder.append(", reviewContent=");
@@ -174,6 +205,10 @@ public class BookReview {
         builder.append(isDeleted);
         builder.append(", createTime=");
         builder.append(createTime);
+        builder.append(", updatedTime=");
+        builder.append(updatedTime);
+        builder.append(", updatedBy=");
+        builder.append(updatedBy);
         builder.append("]");
         return builder.toString();
     }

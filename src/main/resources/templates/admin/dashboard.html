@@ -53,8 +53,9 @@
                     <a class="nav-link active" href="#"><i class="bi bi-speedometer2"></i> Dashboard</a>
                     <a class="nav-link" href="#"><i class="bi bi-plus-circle"></i> Add Article</a>
                     <a class="nav-link" href="#"><i class="bi bi-file-text"></i> Articles</a>
-                    <a class="nav-link" href="#"><i class="bi bi-list-ul"></i> Geners</a>
+                    <a class="nav-link" href="/admin/view/book-genres/list"><i class="bi bi-list-ul"></i> Geners</a>
                     <a class="nav-link" href="/admin/view/book/findBooksByFilters?pageNum=0&pageSize=10&sortField=id&sortDirection=asc"><i class="bi bi-book"></i> Books</a>
+                    <a class="nav-link" href="/admin/view/author/add"><i class="bi bi-person-plus"></i> Add Author</a>
                     <a class="nav-link" href="/admin/view/author/allByConditions?pageNum=0&pageSize=10&sortField=id&sortDirection=asc"><i class="bi bi-people"></i> Authors</a>
                     <a class="nav-link" href="#"><i class="bi bi-gear"></i> Settings</a>
                 </nav>
@@ -112,7 +113,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="card-title">Genres</h6>
-                                        <!-- <h3 class="mb-0" th:text="${categoryCount}"></h3> -->
+                                        <h3 class="mb-0" th:text="${bookGenreCount}"></h3>
                                     </div>
                                     <i class="bi bi-folder"></i>
                                 </div>

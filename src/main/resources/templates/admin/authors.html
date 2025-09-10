@@ -53,8 +53,9 @@
                     <a class="nav-link" href="/admin/view/index"><i class="bi bi-speedometer2"></i> Dashboard</a>
                     <a class="nav-link" href="#"><i class="bi bi-plus-circle"></i> Add Article</a>
                     <a class="nav-link" href="#"><i class="bi bi-file-text"></i> Articles</a>
-                    <a class="nav-link" href="#"><i class="bi bi-list-ul"></i> Geners</a>
+                    <a class="nav-link" href="/admin/view/book-genres/list"><i class="bi bi-list-ul"></i> Geners</a>
                     <a class="nav-link" href="/admin/view/book/findBooksByFilters?pageNum=0&pageSize=10&sortField=id&sortDirection=asc"><i class="bi bi-book"></i> Books</a>
+                    <a class="nav-link" href="/admin/view/author/add"><i class="bi bi-person-plus"></i> Add Author</a>
                     <a class="nav-link active" href="#"><i class="bi bi-people"></i> Authors</a>
                     <a class="nav-link" href="#"><i class="bi bi-gear"></i> Settings</a>
                 </nav>
@@ -125,7 +126,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="card-title">Genres</h6>
-                                        <!-- <h3 class="mb-0" th:text="${bookGenreCount}"></h3> -->
+                                        <h3 class="mb-0" th:text="${bookGenreCount}"></h3>
                                     </div>
                                     <i class="bi bi-list-ul"></i>
                                 </div>
@@ -198,9 +199,10 @@
                                 <th>Status</th>
                                 <th>
                                     <button id="batchInactiveBtn" class="btn btn-warning btn-sm" onclick="batchInactive()">
-                                        Set Inactive
+                                        Set Inactive in batches
                                     </button>
                                 </th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -215,6 +217,10 @@
                                 <td><span th:class="${author.authorStatus == 1 ? 'badge bg-warning' : 'badge bg-success'}" th:text="${author.authorStatus == 1 ? 'Inactive' : 'Active'}"></span></td>
                                 <td>
                                     <input type="checkbox" class="author-checkbox" th:value="${author.id}" th:disabled="${author.authorStatus == 1}">
+                                </td>
+                                <td>
+                                    <a class="btn btn-primary btn-sm" th:href="@{/admin/view/author/update/{id}(id=${author.id})}">Edit</a>
+                                    <!-- <a class="btn btn-danger btn-sm" th:href="@{/admin/view/author/{id}(id=${author.id})/updatedIsDeleted?isDeleted=0}" onclick="return confirm('Are you sure you want to delete this author?');">Delete</a> -->
                                 </td>
                             </tr>                            
                         </tbody>

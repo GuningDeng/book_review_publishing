@@ -1,28 +1,39 @@
 package com.deng.book_review_publishing.init;
 
+import java.util.Date;
+import java.util.Random;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import com.deng.book_review_publishing.entity.Admin;
 import com.deng.book_review_publishing.entity.Author;
 import com.deng.book_review_publishing.entity.Book;
+import com.deng.book_review_publishing.entity.BookGenre;
+import com.deng.book_review_publishing.entity.CountryEntity;
 import com.deng.book_review_publishing.entity.enums.Country;
 import com.deng.book_review_publishing.entity.enums.Genre;
 import com.deng.book_review_publishing.entity.enums.Language;
 import com.deng.book_review_publishing.repository.AdminRepository;
 import com.deng.book_review_publishing.repository.AuthorRepository;
+import com.deng.book_review_publishing.repository.BookGenreRepository;
 import com.deng.book_review_publishing.repository.BookRepository;
+import com.deng.book_review_publishing.repository.CountryEntityRepository;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
     private final AdminRepository adminRepository;
     private final AuthorRepository authorRepository;
     private final BookRepository bookRepository;
+    private final BookGenreRepository bookGenreRepository;
+    private final CountryEntityRepository countryEntityRepository;
     
-    public DataInitializer(AdminRepository adminRepository, AuthorRepository authorRepository, BookRepository bookRepository) {
+    public DataInitializer(AdminRepository adminRepository, AuthorRepository authorRepository, BookRepository bookRepository, BookGenreRepository bookGenreRepository, CountryEntityRepository countryEntityRepository) {
         this.adminRepository = adminRepository;
         this.authorRepository = authorRepository;
         this.bookRepository = bookRepository;
+        this.bookGenreRepository = bookGenreRepository;
+        this.countryEntityRepository = countryEntityRepository;
         
     }
 
@@ -41,12 +52,21 @@ public class DataInitializer implements CommandLineRunner {
         for (int i = 0; i < 50; i++) {
             Author author = new Author();
             int random = (int) (Math.random() * Country.values().length);
-            author.setFirstName("Author First Name " + i);
-            author.setLastName("Author Last Name " + i);
+            Random r = new Random();
+            int max=6,min=1;
+            int randomAdminId = r.nextInt(max - min + 1) + min; // Generates a random number between 1 and 6
+
+            author.setFirstName("AuthorFirstName" + i);
+            author.setLastName("AuthorLastName" + i);
             author.setCountryName(Country.values()[random]);
             author.setAuthorGender((byte) (Math.random() * 2));
             author.setAuthorStatus((byte) (Math.random() * 2));
             author.setIsDeleted((byte) 0);
+
+            author.setCreateTime(new Date());
+            // author.setCreatedByAdminId((long) (Math.random() * 7)); // Assuming admin IDs are from 0 to 6
+            author.setCreatedByAdminId((long) randomAdminId); // Assuming admin IDs are from 1 to 6
+            author.setUpdatedTime(new Date());
             authorRepository.save(author);
         }
 
@@ -79,6 +99,29 @@ public class DataInitializer implements CommandLineRunner {
             book.setCoverImageURL("Image URL" + i);
             book.setFormat("Book Format " + randomFormat);
             bookRepository.save(book);
+        }
+
+        for (int i = 0; i < Genre.values().length; i++) {
+            BookGenre bookGenre = new BookGenre();
+            // int randomGenre = (int) (Math.random() * Genre.values().length);
+            bookGenre.setGenreName(Genre.values()[i]);
+            bookGenre.setGenreDescription("Genre Description " + Genre.values()[i].getDescription());
+            bookGenre.setIsDeleted((byte) 0);
+            bookGenre.setCreateTime(new Date());
+            bookGenreRepository.save(bookGenre);
+        }
+
+        for (int i = 0; i < Country.values().length; i++) {
+            CountryEntity countryEntity = new CountryEntity();
+            countryEntity.setCountryName(Country.values()[i]);
+            countryEntity.setCountryDescription("Country Description " + Country.values()[i].getDescription());
+            countryEntity.setCountryCode(Country.values()[i].getCode());            
+            countryEntity.setIsDeleted((byte) 0);
+            countryEntity.setCreatedByAdminId(1L); // Assuming admin ID 1 is the creator
+            countryEntity.setUpdatedByAdminId(1L); // Assuming admin ID 1 is the updater
+            countryEntity.setCreateTime(new Date());
+            countryEntity.setUpdatedTime(new Date());
+            countryEntityRepository.save(countryEntity);
         }
 
 

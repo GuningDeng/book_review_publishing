@@ -1,6 +1,7 @@
 package com.deng.book_review_publishing.controller.admin.adminAPI;
 
 import java.util.Arrays;
+import java.util.Date;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,8 @@ import com.deng.book_review_publishing.utils.ValidateUtil;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+
 
 
 @RestController
@@ -182,7 +185,7 @@ public class AuthorController {
      * @param isDeleted The new isDeleted status (0 or 1).
      * @return ResponseEntity with the updated author or an error message.
      */
-    @PutMapping("/{id}/isDeleted")
+    @PutMapping("/{id}/updatedIsDeleted")
     public ResponseEntity<?> updateIsDeletedById(@PathVariable Long id, @RequestParam(defaultValue = "0") Byte isDeleted) {
         try {
             logger.debug("Updating isDeleted status for author with id: {} to {}", id, isDeleted);
@@ -246,6 +249,86 @@ public class AuthorController {
                 .body(new ErrorResponse("Error inactivating authors", HttpStatus.INTERNAL_SERVER_ERROR));
         }
     }
+
+    @PostMapping("/addAuthor")
+    public ResponseEntity<?> addAuthor(@RequestBody Author author) {
+        try {
+            logger.debug("Adding new author: {}", author);
+            if (author == null) {
+                logger.warn("Invalid author data provided");
+                return ResponseEntity.badRequest()
+                    .body(new ErrorResponse("Invalid author data", HttpStatus.BAD_REQUEST));
+            }
+            Boolean isSaved = authorService.save(author);
+            if (!isSaved) {
+                logger.warn("Failed to save author: {}", author);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Failed to save author", HttpStatus.INTERNAL_SERVER_ERROR));
+            }
+            Author savedAuthor = authorService.findById(author.getId());
+            if (savedAuthor == null) {
+                logger.warn("Saved author not found after saving: {}", author);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse("Saved author not found", HttpStatus.NOT_FOUND));
+            }
+            logger.info("Author added successfully with id: {}", savedAuthor.getId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedAuthor);
+        } catch (Exception e) {
+            logger.error("Error adding new author", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("Error adding new author", HttpStatus.INTERNAL_SERVER_ERROR));
+        }
+    }
+    
+    @PutMapping("/updateAuthor/{id}")
+    public ResponseEntity<?> updateAuthor(@PathVariable Long id, @RequestBody Author author) {
+        try {
+            logger.debug("Updating author with id: {} with data: {}", id, author);
+            if (id == null || author == null) {
+                logger.warn("Invalid author id or data provided");
+                return ResponseEntity.badRequest()
+                    .body(new ErrorResponse("Invalid author id or data", HttpStatus.BAD_REQUEST));
+            }
+            System.out.println("author.getUpdatedTime: " + author.getUpdatedTime());
+            Author existingAuthor = authorService.findById(id);
+            if (existingAuthor == null) {
+                logger.warn("Author with id: {} not found", id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse("Author not found", HttpStatus.NOT_FOUND));
+            }
+            // Update the existing author's fields
+            existingAuthor.setFirstName(author.getFirstName());
+            existingAuthor.setLastName(author.getLastName());
+            existingAuthor.setCountryName(author.getCountryName());
+            existingAuthor.setAuthorGender(author.getAuthorGender());
+            existingAuthor.setAuthorStatus(author.getAuthorStatus());
+            existingAuthor.setIsDeleted(author.getIsDeleted());
+            existingAuthor.setCreatedByAdminId(author.getCreatedByAdminId());
+            existingAuthor.setUpdatedTime(new Date()); // Set to update to current time
+                        
+            // Save the updated author
+            Boolean isUpdated = authorService.save(existingAuthor);
+            
+            if (!isUpdated) {
+                logger.warn("Failed to update author with id: {}", id);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Failed to update author", HttpStatus.INTERNAL_SERVER_ERROR));
+            }
+            Author updatedAuthor = authorService.findById(id);
+            if (updatedAuthor == null) {
+                logger.warn("Updated author with id: {} not found after update", id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse("Updated author not found", HttpStatus.NOT_FOUND));
+            }
+            logger.info("Author with id: {} updated successfully", id);
+            return ResponseEntity.ok(updatedAuthor);
+        } catch (Exception e) {
+            logger.error("Error updating author with id: {}", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("Error updating author", HttpStatus.INTERNAL_SERVER_ERROR));
+        }
+    }    
+    
 }
 
 
