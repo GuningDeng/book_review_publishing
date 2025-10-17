@@ -51,8 +51,8 @@
                 <h4 class="mb-4 ps-3">Admin Dashboard</h4>
                 <nav class="nav flex-column">
                     <a class="nav-link active" href="#"><i class="bi bi-speedometer2"></i> Dashboard</a>
-                    <a class="nav-link" href="#"><i class="bi bi-plus-circle"></i> Add Article</a>
-                    <a class="nav-link" href="#"><i class="bi bi-file-text"></i> Articles</a>
+                    <a class="nav-link" href="/admin/view/book/findBooksByFilters?pageNum=0&pageSize=10&sortField=id&sortDirection=asc"><i class="bi bi-plus-circle"></i> Add Book Review</a>
+                    <a class="nav-link" href="/admin/view/bookReview/bookReviewByFilters?pageNum=0&pageSize=10&sortField=id&sortDirection=asc"><i class="bi bi-file-text"></i> Book Reviews</a>
                     <a class="nav-link" href="/admin/view/book-genres/list"><i class="bi bi-list-ul"></i> Geners</a>
                     <a class="nav-link" href="/admin/view/book/findBooksByFilters?pageNum=0&pageSize=10&sortField=id&sortDirection=asc"><i class="bi bi-book"></i> Books</a>
                     <a class="nav-link" href="/admin/view/author/add"><i class="bi bi-person-plus"></i> Add Author</a>
@@ -86,8 +86,10 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="card-title">Total Articles</h6>
-                                        <!-- <h3 class="mb-0" th:text="${articleCount}"></h3> -->
+                                        <h6 class="card-title">Total Book Reviews</h6>
+                                        <h3 class="mb-2" th:text="${bookReviewCount}"></h3>
+                                        <h6 class="card-title">Published Book Reviews</h6>
+                                        <h3 class="mb-0" th:text="${publishedBookReviewCount}"></h3>
                                     </div>
                                     <i class="bi bi-file-text"></i>
                                 </div>
@@ -142,30 +144,36 @@
                     <div class="col-md-8 mb-5">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="card-title mb-0">Recent Articles</h5>
+                                <h5 class="card-title mb-0">Recent Book Reviews</h5>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
                                     <table class="table">
                                         <thead>
                                             <tr>
-                                                <th>Title</th>
-                                                <th>Category</th>
-                                                <th>Status</th>
+                                                <th>Book Review Title</th>
+                                                <th>Autor</th>
+                                                <th>Book ID</th>
                                                 <th>Views</th>
                                                 <th>Date</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <!-- <tr th:each="article : ${articles}">
-                                                <td th:text="${article.title}"></td>
-                                                <td th:text="${article.category.name}"></td>
-                                                <td th:text="${article.status}"></td>
-                                                <td th:text="${article.views}"></td>
-                                                <td th:text="${#dates.format(article.createTime, 'yyyy-MM-dd HH:mm')}"></td>
+                                            <tr th:each="bookReview : ${recentBookReviews}">
+                                                <td>
+                                                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" th:href="@{/admin/view/bookReview/{id}(id = ${bookReview.id})}" th:text="${bookReview.reviewTitle}">
+                                                        <span th:text="${bookReview.reviewTitle}"></span>
+                                                    </a>
+                                                </td>
+                                                <td th:text="${bookReview.reviewAuthor}"></td>
+                                                <td>
+                                                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" th:href="@{/admin/view/book/{id}(id=${bookReview.bookId})}" th:text="${bookReview.bookId}"></a>
+                                                </td>
+                                                <td th:text="${bookReview.views}"></td>
+                                                <td th:text="${#dates.format(bookReview.createTime, 'yyyy-MM-dd HH:mm')}"></td>
                                             </tr>
-                                            <tr th:if="${#lists.isEmpty(articles)}">
-                                                <td colspan="5" class="text-center">No articles found</td> -->
+                                            <tr th:if="${#lists.isEmpty(recentBookReviews)}">
+                                                <td colspan="5" class="text-center">No articles found</td>
                                         </tbody>
                                     </table>
                                 </div>
@@ -179,7 +187,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="d-grid gap-2">
-                                    <a href="#" class="btn btn-primary"><i class="bi bi-plus-circle me-2"></i>Add Article</a>
+                                    <a href="#" class="btn btn-primary"><i class="bi bi-plus-circle me-2"></i>Add Book Review</a>
                                     <a href="#" class="btn btn-outline-primary"><i class="bi bi-folder-plus me-2"></i>Add Gener</a>
                                     <a href="#" class="btn btn-outline-primary"><i class="bi bi-person-plus me-2"></i>Add Author</a>
                                 </div>

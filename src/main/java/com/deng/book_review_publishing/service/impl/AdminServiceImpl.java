@@ -97,15 +97,26 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public Boolean updateAdminLockStatus(Long id, byte lockedStatus) {
         try {
-            if (id == null || id <= 0) {
+            if (id == null) {
+                log.debug("Received null id for deleteById");
+                return false;
+            }
+            if (id <= 0) {
                 log.error("Invalid admin ID provided: {}", id);
-                throw new IllegalArgumentException("Admin ID must be a positive number");
+                return false;
             }
             if (lockedStatus != 0 && lockedStatus != 1) {
                 log.error("Invalid locked status provided: {}", lockedStatus);
-                throw new IllegalArgumentException("Invalid locked status");
+                return false;
             }
-            Admin admin = findById(id);
+
+            if (!existsById(id)) {
+                log.warn("Admin with ID {} does not exist", id);
+                return false;
+            }
+
+            Admin admin = adminRepository.findById(id).orElseThrow(() -> new RuntimeException("Admin not found"));
+            System.out.println("admin = " + admin);
             if (admin == null) {
                 log.warn("Admin with ID {} does not exist", id);
                 return false;
@@ -114,15 +125,28 @@ public class AdminServiceImpl implements AdminService {
                 log.info("Admin with ID {} already has the specified locked status {}", id, lockedStatus);
                 return true; // No update needed
             }
-            int result = adminRepository.updateAdminLockStatus(id, lockedStatus);
+            int result = adminRepository.updateAdminLockStatus(id, lockedStatus); // Update the admin entity in the database
+            System.out.println("result = " + result);
             if (result == 0) {
-                log.warn("Admin with ID {} does not exist", id);
+                log.warn("Admin with ID {} does not updated", id);
                 return false;    
             }
+
+            // Admin updatedAdmin = adminRepository.findById(id).orElseThrow(() -> new RuntimeException("Updated Admin not found")); // Refresh the admin entity from the database
+            // System.out.println("updatedAdmin = " + updatedAdmin);
+            // if (updatedAdmin == null) {
+            //     log.warn("Failed to retrieve updated admin with ID: {}", id);
+            //     return false;
+                
+            // }
+            // if (updatedAdmin.getLocked() != lockedStatus) {
+            //     log.warn("Admin with ID {} locked status update failed", id);
+            //     return false; 
+            // }
             
-            log.info("Admin locked status set to 1 for ID: {}", id);
-            return true; // Return true if the update was successful
-            
+            log.info("Admin locked status set to {} for ID: {}", lockedStatus, id);
+            return result == 1; // Return true if the update was successful
+        
         } catch (Exception e) {
             log.error("Error setting admin locked status for ID {}: {}", id, e.getMessage());
             // throw new RuntimeException("Error setting admin locked status", e);

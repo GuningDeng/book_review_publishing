@@ -34,6 +34,23 @@ public class BookViewController {
         logger.debug("BookViewController initialized with services: {}, {}, {}", authorService, bookService, bookGenreService);
     }
 
+    /**
+     * Get all books with pagination and sorting
+     * @param model
+     * @param pageNum default 0
+     * @param pageSize default 10, max 100
+     * @param sortField default id, other values: bookName, bookDescription, languageName, publisher, publishYear, isPublished
+     * @param sortDirection default asc, other values: desc
+     * @param bookName
+     * @param bookISBN
+     * @param bookASIN
+     * @param bookDescription
+     * @param languageName
+     * @param publisher
+     * @param publishYear
+     * @param isPublished default 0, other values: 1
+     * @return
+     */
     @GetMapping("/findBooksByFilters")
     public String findBooksByFilters(
         Model model,

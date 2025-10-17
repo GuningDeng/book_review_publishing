@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Book Reviews</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            background-color: #212529;
+            min-height: 100vh;
+            color: white;
+            padding-top: 20px;
+        }
+        .sidebar .nav-link {
+            color: #fff;
+            padding: 10px 20px;
+            margin: 5px 0;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: #0d6efd;
+            border-radius: 5px;
+        }
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        .admin-profile {
+            padding: 15px 20px;
+            border-top: 1px solid #444;
+            margin-top: 20px;
+        }
+        .admin-profile img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <p class="text-uppercase text-center text-white mb-2">Book Review Publishing System</p>
+                <hr class="sidebar-divider">
+                <h4 class="mb-4 ps-3">Admin book reviews</h4>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/admin/view/index"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                    <a class="nav-link" href="/admin/view/book/findBooksByFilters?pageNum=0&pageSize=10&sortField=id&sortDirection=asc"><i class="bi bi-plus-circle"></i> Add Book Review</a>
+                    <a class="nav-link active" href="/admin/view/bookReview/bookReviewByFilters?pageNum=0&pageSize=10&sortField=id&sortDirection=asc"><i class="bi bi-file-text"></i> Book Review</a>
+                    <a class="nav-link" href="/admin/view/book-genres/list"><i class="bi bi-list-ul"></i> Geners</a>
+                    <a class="nav-link" href="/admin/view/book/findBooksByFilters?pageNum=0&pageSize=10&sortField=id&sortDirection=asc"><i class="bi bi-book"></i> Books</a>
+                    <a class="nav-link" href="/admin/view/author/add"><i class="bi bi-person-plus"></i> Add Author</a>
+                    <a class="nav-link" href="/admin/view/author/allByConditions?pageNum=0&pageSize=10&sortField=id&sortDirection=asc"><i class="bi bi-people"></i> Authors</a>
+                    <a class="nav-link" href="#"><i class="bi bi-gear"></i> Settings</a>
+                </nav>
+                <div class="admin-profile">
+                    <div class="d-flex align-items-center">
+                        <img src="https://github.com/mdo.png" alt="Admin" class="me-2">
+                        <div class="dropdown">
+                            <button class="btn btn-link text-white text-decoration-none dropdown-toggle" type="button" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Admin
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                <li><a class="dropdown-item" href="#">Profile</a></li>
+                                <li><a class="dropdown-item" href="#">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <h2 class="mb-4">Overview - Book Reviews</h2>
+                
+                <!-- Statistics Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card bg-primary text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-title">Total Book Reviews</h6>
+                                        <h3 class="mb-0" th:text="${totalBookreviews}"></h3>
+                                    </div>
+                                    <i class="bi bi-people"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card bg-success text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-title">Active Authors</h6>
+                                        <h3 class="mb-0" th:text="${authorCount}"></h3>
+                                    </div>
+                                    <i class="bi bi-people"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card bg-info text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-title">Published Books</h6>
+                                        <h3 class="mb-0" th:text="${totalBoeks}"></h3>
+                                    </div>
+                                    <i class="bi bi-book-half"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card bg-warning text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-title">Genres</h6>
+                                        <h3 class="mb-0" th:text="${bookGenreCount}"></h3>
+                                    </div>
+                                    <i class="bi bi-list-ul"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="filter-section mb-3">
+                    <form th:action="@{/admin/view/bookReview/bookReviewByFilters}" method="get" id="reviewTitle" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="reviewTitleFilter" class="form-label">Review title(partial match)</label>
+                            <input type="text" class="form-control" name="reviewTitle" id="reviewTitleFilter" th:value="${param.reviewTitle}" placeholder="Search by review title">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="reviewAuthorFilter" class="form-label">Review author(partial match)</label>
+                            <input type="text" class="form-control" name="reviewAuthor" id="reviewAuthorFilter" th:value="${param.reviewAuthor}" placeholder="Search by review author">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="bookIdFilter" class="form-label">Book ID</label>
+                            <input type="number" class="form-control" name="bookId" id="bookIdFilter" th:value="${param.bookId}" placeholder="Search by book ID">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="yearFilter" class="form-label">Publish year(exact match)</label>
+                            <input type="number" min="1900" max="2100" class="form-control" name="year" id="yearFilter" th:value="${param.year}" placeholder="Publish year since: 1900">                            
+                        </div>
+                        <div class="col-md-3">
+                            <label for="monthFilter" class="form-label">Publish month(exact match)</label>
+                            <input type="number" min="1" max="12" class="form-control" name="month" id="monthFilter" th:value="${param.month}" placeholder="Publish month since: 1">                            
+                        </div>
+                        <div class="col-md-3">
+                            <label for="reviewStatusFilter" class="form-label">Review status</label>
+                            <select class="form-select" id="reviewStatusFilter" name="reviewStatus" th:value="${param.reviewStatus}">
+                                <option value="">Status</option>
+                                <option value="0" th:selected="${param.reviewStatus == 0}">Draft</option>
+                                <option value="1" th:selected="${param.reviewStatus == 1}">Unpublished</option>
+                                <option value="2" th:selected="${param.reviewStatus == 2}">Published</option>
+                                
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Apply Filters</button>
+                            <a href="/admin/view/bookReview/bookReviewByFilters?pageNum=0&pageSize=10&sortField=id&sortDirection=asc" class="btn btn-secondary ms-2">Reset</a>
+                        </div>
+                        <input type="hidden" name="pageNum" id="pageNum" th:value="${pageNum}">
+                        <input type="hidden" name="sortField" id="sortField" th:value="${param.sortField}">
+                        <input type="hidden" name="sortDirection" id="sortDirection" th:value="${param.sortDirection}">
+                    </form>
+                    
+                </div>
+                <div class="mb-5">
+                </div>
+                <!-- Book Reviews -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="#" id="idLink">ID</a>
+                                    <span class="sort-icon" th:if="${sortField == 'id'}">
+                                        <i th:class="${sortDirection == 'asc'? 'bi bi-sort-up' : 'bi bi-sort-down'}"></i>
+                                    </span>
+                                </th>
+                                <th>
+                                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="#" id="reviewTitleLink">Review title</a>
+                                    <span class="sort-icon" th:if="${sortField == 'reviewTitle'}">
+                                        <i th:class="${sortDirection == 'asc'? 'bi bi-sort-up' : 'bi bi-sort-down'}"></i>
+                                    </span>
+                                </th>
+                                <th>
+                                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="#" id="reviewAuthorLink">Review author</a>
+                                    <span class="sort-icon" th:if="${sortField == 'reviewAuthor'}">
+                                        <i th:class="${sortDirection == 'asc'? 'bi bi-sort-up' : 'bi bi-sort-down'}"></i>
+                                    </span>
+                                </th>
+                                <th>
+                                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="#" id="bookIdLink">Book ID</a>
+                                    <span class="sort-icon" th:if="${sortField == 'bookId'}">
+                                        <i th:class="${sortDirection == 'asc'? 'bi bi-sort-up' : 'bi bi-sort-down'}"></i>
+                                    </span>
+                                </th>
+                                <th>
+                                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="#" id="viewsLink">Views</a>
+                                    <span class="sort-icon" th:if="${sortField == 'views'}">
+                                        <i th:class="${sortDirection == 'asc'? 'bi bi-sort-up' : 'bi bi-sort-down'}"></i>
+                                    </span>
+                                </th>
+                                <th>
+                                    Year
+                                </th>
+                                <th>
+                                    Month
+                                </th>
+                                <th>
+                                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="#" id="reviewStatusLink">Review status</a>
+                                    <span class="sort-icon" th:if="${sortField == 'reviewStatus'}">
+                                        <i th:class="${sortDirection == 'asc'? 'bi bi-sort-up' : 'bi bi-sort-down'}"></i>
+                                    </span>
+                                </th>
+                                <th>
+                                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="#" id="isDeletedLink">Active</a>
+                                    <span class="sort-icon" th:if="${sortField == 'isDeleted'}">
+                                        <i th:class="${sortDirection == 'asc'? 'bi bi-sort-up' : 'bi bi-sort-down'}"></i>
+                                    </span>
+                                </th>
+                                <th>
+                                    <button id="batchInactiveBtn" class="btn btn-warning btn-sm" onclick="batchInactive()">
+                                        Set Inactive in batches
+                                    </button>
+                                </th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(bookReviewsPage)}">
+                                <td colspan="10" class="text-center">No books found</td>
+                            </tr>
+                            <tr>
+                            <tr th:each="bookReview : ${bookReviewsPage.content}">
+                                <td><a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" th:href="@{/admin/view/bookReview/{id}(id = ${bookReview.id})}"><span th:text="${bookReview.id}"></span></a></td>
+                                <td th:text="${bookReview.reviewTitle}"></td>
+                                <td th:text="${bookReview.reviewAuthor}"></td>
+                                <td th:text="${bookReview.bookId}"></td>
+                                <td th:text="${bookReview.views}"></td>
+                                <td th:text="${#dates.year(bookReview.createTime)}"></td>
+                                 <!-- <td th:text="${bookReview.createTime}"></td> -->
+                                <td th:text="${#dates.month(bookReview.createTime)}"></td>
+                                <td>
+                                    <span th:class="${bookReview.reviewStatus == 0 ? 'badge bg-secondary' : (bookReview.reviewStatus == 1 ? 'badge bg-warning' : 'badge bg-success')}" 
+                                          th:text="${bookReview.reviewStatus == 0 ? 'Draft' : (bookReview.reviewStatus == 1 ? 'Unpublished' : 'Published')}"></span>
+                                </td>
+                                
+                                <td><span th:class="${bookReview.isDeleted == 1 ? 'badge bg-warning' : 'badge bg-success'}" th:text="${bookReview.isDeleted == 1 ? 'Inactive' : 'Active'}"></span></td>
+                                <td>
+                                    <input type="checkbox" class="bookReview-checkbox" th:value="${bookReview.id}" th:disabled="${bookReview.isDeleted == 1}">
+                                </td>
+                                <td>
+                                    <a class="btn btn-primary btn-sm" th:href="@{/admin/view/bookReview/update/{id}(id=${bookReview.id})}">Edit</a>
+                                    
+                                </td>
+                            </tr>                            
+                        </tbody>
+                    </table>
+                </div>  
+            
+                <!-- Pagination -->
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:if="${bookReviewsPage.hasPrevious()}">
+                            <!-- <a class="page-link" th:href="@{'/admin/view/author/allByConditions'(pageNum=${authors.number - 1},pageSize=${param.pageSize},sortField=${param.sortField},sortDirection=${param.sortDirection},firstName=${param.firstName},countryName=${param.countryName},authorStatus=${param.authorStatus})}" aria-label="Previous"> -->
+                            <a class="page-link" th:href="@{'/admin/view/bookReview/bookReviewByFilters'(pageNum=${bookReviewsPage.number - 1},pageSize=${param.pageSize},sortField=${param.sortField},sortDirection=${param.sortDirection},reviewAuthor=${param.reviewAuthor},reviewAuthorId=${param.reviewAuthorId},reviewContent=${param.reviewContent},reviewTitle=${param.reviewTitle},views=${param.views},reviewStatus=${param.reviewStatus},isDeleted=${param.isDeleted},year=${param.year},month=${param.month})}" aria-label="Previous">
+                                <span aria-hidden="true">Previous</span>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, bookReviewsPage.totalPages - 1)}" th:classappend="${i == bookReviewsPage.number} ? 'active' : ''">
+                            <!-- <a class="page-link" th:href="@{'/admin/view/author/allByConditions'(pageNum=${i},pageSize=${param.pageSize},sortField=${param.sortField},sortDirection=${param.sortDirection},firstName=${param.firstName},countryName=${param.countryName},authorStatus=${param.authorStatus})}" th:text="${i + 1}"></a> -->
+                            <a class="page-link" th:href="@{'/admin/view/bookReview/bookReviewByFilters'(pageNum=${i},pageSize=${param.pageSize},sortField=${param.sortField},sortDirection=${param.sortDirection},reviewAuthor=${param.reviewAuthor},reviewAuthorId=${param.reviewAuthorId},reviewContent=${param.reviewContent},reviewTitle=${param.reviewTitle},views=${param.views},reviewStatus=${param.reviewStatus},isDeleted=${param.isDeleted},year=${param.year},month=${param.month})}" th:text="${i + 1}"></a>
+                        </li>
+                        <li class="page-item" th:if="${bookReviewsPage.hasNext()}">
+                            <a class="page-link" th:href="@{'/admin/view/bookReview/bookReviewByFilters'(pageNum=${bookReviewsPage.number + 1},pageSize=${param.pageSize},sortField=${param.sortField},sortDirection=${param.sortDirection},reviewAuthor=${param.reviewAuthor},reviewAuthorId=${param.reviewAuthorId},reviewContent=${param.reviewContent},reviewTitle=${param.reviewTitle},views=${param.views},reviewStatus=${param.reviewStatus},isDeleted=${param.isDeleted},year=${param.year},month=${param.month})}" aria-label="Next">  
+                                <span aria-hidden="true">Next</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // intitialize pathparam
+        const pathParametersMap = new Map();
+        const currentUrl = new URL(window.location.href);
+        const params = new URLSearchParams(currentUrl.search);
+        var sortDirection = params.get('sortDirection') === "asc"? "desc" : "asc";
+        params.set('sortDirection', sortDirection);
+
+        const idLink = document.getElementById('idLink');
+        var paramsIDURL = params;
+        paramsIDURL.set('sortField', 'id');
+        idLink.href = `${currentUrl.pathname}?${paramsIDURL.toString()}`;
+        console.log("idLink url: " + idLink.href);
+
+        const reviewTitleLink = document.getElementById('reviewTitleLink');
+        var paramsReviewTitleURL = params;
+        paramsReviewTitleURL.set('sortField', 'reviewTitle');
+        reviewTitleLink.href = `${currentUrl.pathname}?${paramsReviewTitleURL.toString()}`;
+        console.log("reviewTitleLink url: " + reviewTitleLink.href);
+
+        const reviewAuthorLink = document.getElementById('reviewAuthorLink');
+        var paramsReviewAuthorURL = params;
+        paramsReviewAuthorURL.set('sortField', 'reviewAuthor');
+        reviewAuthorLink.href = `${currentUrl.pathname}?${paramsReviewAuthorURL.toString()}`;
+        console.log("reviewAuthorLink url: " + reviewAuthorLink.href);
+
+        const bookIdLink = document.getElementById('bookIdLink');
+        var paramsBookIdURL = params;
+        paramsBookIdURL.set('sortField', 'bookId');
+        bookIdLink.href = `${currentUrl.pathname}?${paramsBookIdURL.toString()}`;
+        console.log("bookIdLink url: " + bookIdLink.href);
+
+        const viewsLink = document.getElementById('viewsLink');
+        var paramsViewsURL = params;
+        paramsViewsURL.set('sortField', 'views');
+        viewsLink.href = `${currentUrl.pathname}?${paramsViewsURL.toString()}`;
+        console.log("viewsLink url: " + viewsLink.href);
+
+        const reviewStatusLink = document.getElementById('reviewStatusLink');
+        var paramsReviewStatusURL = params;
+        paramsReviewStatusURL.set('sortField', 'reviewStatus');
+        reviewStatusLink.href = `${currentUrl.pathname}?${paramsReviewStatusURL.toString()}`;
+        console.log("reviewStatusLink url: " + reviewStatusLink.href);
+
+        // function to set inactive    
+        function batchInactive() {
+            const selectedCheckboxes = document.querySelectorAll('.bookReview-checkbox:checked');
+            const bookReviewIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
+            
+            if (bookReviewIds.length === 0) {
+                alert('Please select at least one book review');
+                return;
+            }
+
+            if (!confirm('Are you sure you want to set these book reviews as inactive?')) {
+                return;
+            }
+
+            fetch('/admin/api/bookReview/batch/inactive', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(bookReviewIds)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Successfully updated book reviews status');
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to update book reviews status');
+            });
+        }
+
+    </script>
+    
+</body>
+</html>

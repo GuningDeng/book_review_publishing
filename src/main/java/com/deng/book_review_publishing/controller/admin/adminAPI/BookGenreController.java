@@ -26,11 +26,12 @@ public class BookGenreController {
     }
 
     // Example method signatures:
-    // @PostMapping("/book-genres")
-    // public ResponseEntity<BookGenre> createBookGenre(@RequestBody BookGenre bookGenre) {
-    //     // Implementation here
-    // }
     
+    /**
+     * Get book genre by ID
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getBookGenreById(@PathVariable Long id) {
         try {
@@ -51,17 +52,13 @@ public class BookGenreController {
         }
     }
     
-    // @PutMapping("/book-genres/{id}")
-    // public ResponseEntity<BookGenre> updateBookGenre(@PathVariable Long id, @RequestBody BookGenre bookGenre) {
-    //     // Implementation here
-    // }
-    
-    // @DeleteMapping("/book-genres/{id}")
-    // public ResponseEntity<Void> deleteBookGenre(@PathVariable Long id) {
-    //     // Implementation here
-    // }
-
-    @PutMapping("/{id}/is-deleted")
+    /**
+     * Update book genre delete status
+     * @param id
+     * @param isDeleted 0: not deleted, 1: deleted
+     * @return
+     */
+    @PutMapping("/{id}/isDeleted")
     public ResponseEntity<?> updateBookGenreIsDeleteStatus(@PathVariable Long id, @RequestParam(defaultValue = "0") byte isDeleted) {
         try {
             if (id <= 0) {
@@ -98,6 +95,10 @@ public class BookGenreController {
         }
     }
     
+    /**
+     * Get all book genres
+     * @return
+     */
     @GetMapping("/all")
     public ResponseEntity<?> getAllBookGenres() {
         try {

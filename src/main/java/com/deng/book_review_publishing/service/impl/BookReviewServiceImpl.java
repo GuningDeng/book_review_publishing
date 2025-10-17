@@ -9,11 +9,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.deng.book_review_publishing.entity.Book;
 import com.deng.book_review_publishing.entity.BookReview;
 import com.deng.book_review_publishing.repository.BookReviewRepository;
 import com.deng.book_review_publishing.service.BookReviewService;
 import com.deng.book_review_publishing.utils.ValidateUtil;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BookReviewServiceImpl implements BookReviewService {
@@ -33,7 +35,7 @@ public class BookReviewServiceImpl implements BookReviewService {
                 logger.error("Book review ID is less than or equal to 0");
                 return null;
             }
-            BookReview bookReview = bookReviewRepository.findById(id).orElse(null);
+            BookReview bookReview = bookReviewRepository.findById(id).orElseThrow(() -> new RuntimeException("Book review not found"));
             logger.info("Book review found: {}", bookReview);
             return bookReview;
         } catch (Exception e) {
@@ -104,7 +106,7 @@ public class BookReviewServiceImpl implements BookReviewService {
                 logger.error("IDs array is null or empty");
                 return false;
             }
-            if (reviewStatus < 0 || reviewStatus > 1) {
+            if (reviewStatus < 0 || reviewStatus > 2) {
                 logger.error("Invalid review status: {}", reviewStatus);
                 return false;
             }
@@ -114,7 +116,15 @@ public class BookReviewServiceImpl implements BookReviewService {
                     return false;
                 }
             }
-            bookReviewRepository.inactiveBatch(ids, reviewStatus);
+            int updatedCount = bookReviewRepository.inactiveBatch(ids, reviewStatus);
+            
+            logger.debug("Updated {} book reviews to status {}", updatedCount, reviewStatus);
+
+            if (updatedCount != ids.length) {
+                logger.warn("Not all book reviews were updated. Expected: {}, Actual: {}", ids.length, updatedCount);
+                return false;
+            }
+            
             logger.info("Modified status of book reviews with IDs: {}", (Object) ids);
             
             // Verify the status of updated authors
@@ -152,8 +162,22 @@ public class BookReviewServiceImpl implements BookReviewService {
                 }
             }
             int updatedCount = bookReviewRepository.deleteBatch(ids, isDeleted);
+            if (updatedCount != ids.length) {
+                logger.warn("Not all book reviews were updated. Expected: {}, Actual: {}", ids.length, updatedCount);
+                return false;
+            }
+
+            Boolean allSuccessed = true;
+            for (Long id : ids) {
+                BookReview bookReview = bookReviewRepository.findById(id).orElse(null);
+                if (bookReview == null || bookReview.getIsDeleted() != isDeleted) {
+                    logger.error("Book review with ID {} was not updated correctly", id);
+                    allSuccessed = false;
+                    break;
+                }
+            }
             logger.info("Updated {} book reviews to isDeleted = {}", updatedCount, isDeleted);
-            return updatedCount > 0;
+            return allSuccessed;
         } catch (Exception e) {
             logger.error("Error deleting or keeping book reviews in batch: {}", e.getMessage());
             return false;
@@ -162,22 +186,26 @@ public class BookReviewServiceImpl implements BookReviewService {
     @Override
     public Page<BookReview> findBookReviewByFilters(int pageNum, int pageSize, String sortField, String sortDirection, 
     Long bookId, String reviewAuthor, Long reviewAuthorId, String reviewContent, String reviewTitle, 
-    Integer view, byte reviewStatus, byte isDeleted, Integer year, Integer month) {
+    Integer views, byte reviewStatus, byte isDeleted, Integer year, Integer month) {
         
             try {
                 pageNum = ValidateUtil.validatePaginationParamPageNum(pageNum, 0);
                 pageSize = ValidateUtil.validatePaginationParamPageSize(pageSize, 10, 100);
-                sortField = ValidateUtil.validateAndNormalizeSortField(sortField, new String[]{"id", "bookId", "reviewAuthor", "reviewAuthorId", "reviewTitle", "view", "reviewStatus", "isDeleted"}, "id");
+                sortField = ValidateUtil.validateAndNormalizeSortField(sortField, new String[]{"id", "bookId", "reviewAuthor", "reviewAuthorId", "reviewTitle", "views", "reviewStatus", "isDeleted"}, "id");
                 sortDirection = ValidateUtil.validateAndNormalizeSortDirection(sortDirection);
                 
                 logger.info("Page number: {}, page size: {}, sort field: {}, sort direction: {}", pageNum, pageSize, sortField, sortDirection);
-             
-                if (reviewStatus!=0 && reviewStatus!=1 ) {
+                
+                if (isDeleted != 0 && isDeleted != 1) {
+                    isDeleted = 0;                    
+                }
+
+                if (reviewStatus!=0 && reviewStatus!=1 && reviewStatus!=2) {
                     reviewStatus = 0;
                 }
 
                 Pageable pageable = PageRequest.of(pageNum, pageSize, ValidateUtil.createSort(sortField, sortDirection));
-                Page<BookReview> bookReviewPage = bookReviewRepository.findBookReviewByFilters(bookId, reviewAuthor, reviewAuthorId, reviewContent, reviewTitle, view, reviewStatus, isDeleted, year, month, pageable);
+                Page<BookReview> bookReviewPage = bookReviewRepository.findBookReviewByFilters(bookId, reviewAuthor, reviewAuthorId, reviewContent, reviewTitle, views, reviewStatus, isDeleted, year, month, pageable);
                 logger.info("book review found: {}", bookReviewPage);
                 return bookReviewPage;
 
@@ -266,21 +294,25 @@ public class BookReviewServiceImpl implements BookReviewService {
             return false;
         }
     }
+
     @Override
-    public BookReview finBookReviewById(Long id) {
+    @Transactional(readOnly = true)
+    public List<BookReview> findRecentBookReviewsByStatus(byte reviewStatus, int limit) {
         try {
-            if (id == null) {
-                logger.error("Book ID is null");
-                return new BookReview();
+            List<BookReview> recent = bookReviewRepository.findAll().stream()
+                .filter(br -> br.getReviewStatus() == reviewStatus)
+                .sorted((br1, br2) -> br2.getCreateTime().compareTo(br1.getCreateTime()))
+                .limit(limit)
+                .collect(Collectors.toList());
+            if (recent == null || recent.isEmpty()) {
+                return java.util.Collections.emptyList();
             }
-            if (id <= 0) {
-                logger.error("Book ID is less than or equal to 0");
-                return new BookReview();
-            }
-            return bookReviewRepository.findById(id).orElse(new BookReview());
+            // List<BookReview> recent = all.stream().limit(limit).collect(Collectors.toList());
+            logger.info("Fetched {} recent book reviews with status {}", recent.size(), reviewStatus);
+            return recent;
         } catch (Exception e) {
-            logger.error("Error finding book by ID: {}", e.getMessage());
-            return new BookReview();
+            logger.error("Error fetching recent book reviews by status: {}", e.getMessage(), e);
+            return java.util.Collections.emptyList();
         }
     }
     

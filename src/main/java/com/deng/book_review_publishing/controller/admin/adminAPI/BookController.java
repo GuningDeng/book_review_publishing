@@ -25,6 +25,14 @@ public class BookController {
     }
     
     // Add API methods here
+    /**
+     * Get books by is published status with pagination and sorting
+     * @param pageNum
+     * @param pageSize default 10, max 100
+     * @param sortField
+     * @param sortDirection
+     * @return
+     */
     @GetMapping("/booksByIsPublishedStatus")
     public ResponseEntity<?> getBooksByIsPublishedStatus(
         @RequestParam(defaultValue = "0") int pageNum,
@@ -57,6 +65,22 @@ public class BookController {
         }
     }
 
+    /**
+     * Get books by filters with pagination and sorting
+     * @param pageNum
+     * @param pageSize default 10, max 100
+     * @param sortField default id, other values: bookName, languageName, publisher, publishYear
+     * @param sortDirection default asc, other values: desc
+     * @param bookName
+     * @param bookISBN
+     * @param bookASIN
+     * @param bookDescription
+     * @param publisher
+     * @param languageName
+     * @param publishYear
+     * @param isPublished 0: not published, 1: published
+     * @return
+     */
     @GetMapping("/booksByFilters")
     public ResponseEntity<?> getBooksByFilters(
         @RequestParam(defaultValue = "0") int pageNum,
@@ -70,7 +94,7 @@ public class BookController {
         @RequestParam(required = false) String publisher,
         @RequestParam(required = false) String languageName,
         @RequestParam(required = false) Integer publishYear,
-        @RequestParam(required = false, defaultValue = "0") Byte isPublished
+        @RequestParam(required = false, defaultValue = "0") Byte isPublished 
     ){
         try {
             logger.debug("Fetching books by filters with pagination and sorting");

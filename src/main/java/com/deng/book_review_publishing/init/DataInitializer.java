@@ -10,30 +10,30 @@ import com.deng.book_review_publishing.entity.Admin;
 import com.deng.book_review_publishing.entity.Author;
 import com.deng.book_review_publishing.entity.Book;
 import com.deng.book_review_publishing.entity.BookGenre;
+import com.deng.book_review_publishing.entity.BookReview;
 import com.deng.book_review_publishing.entity.CountryEntity;
 import com.deng.book_review_publishing.entity.enums.Country;
 import com.deng.book_review_publishing.entity.enums.Genre;
 import com.deng.book_review_publishing.entity.enums.Language;
-import com.deng.book_review_publishing.repository.AdminRepository;
-import com.deng.book_review_publishing.repository.AuthorRepository;
-import com.deng.book_review_publishing.repository.BookGenreRepository;
-import com.deng.book_review_publishing.repository.BookRepository;
-import com.deng.book_review_publishing.repository.CountryEntityRepository;
+import com.deng.book_review_publishing.repository.*;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
+
+    private final BookReviewRepository bookReviewRepository;
     private final AdminRepository adminRepository;
     private final AuthorRepository authorRepository;
     private final BookRepository bookRepository;
     private final BookGenreRepository bookGenreRepository;
     private final CountryEntityRepository countryEntityRepository;
     
-    public DataInitializer(AdminRepository adminRepository, AuthorRepository authorRepository, BookRepository bookRepository, BookGenreRepository bookGenreRepository, CountryEntityRepository countryEntityRepository) {
+    public DataInitializer(AdminRepository adminRepository, AuthorRepository authorRepository, BookRepository bookRepository, BookGenreRepository bookGenreRepository, CountryEntityRepository countryEntityRepository, BookReviewRepository bookReviewRepository) {
         this.adminRepository = adminRepository;
         this.authorRepository = authorRepository;
         this.bookRepository = bookRepository;
         this.bookGenreRepository = bookGenreRepository;
         this.countryEntityRepository = countryEntityRepository;
+        this.bookReviewRepository = bookReviewRepository;
         
     }
 
@@ -124,7 +124,26 @@ public class DataInitializer implements CommandLineRunner {
             countryEntityRepository.save(countryEntity);
         }
 
+        for (int i = 0; i < 100; i++) {
+            BookReview bookReview = new BookReview();
+            // Long bookIdRandom = (long) (Math.random() * 100);
+            // int randomRating = 1 + (int) (Math.random() * 5); // Ratings between 1 and 5
+            int publishYear = 1900 + (int) (Math.random() * 120);
+            bookReview.setBookId((long) i+1); // Assuming book IDs start from 1
+            bookReview.setReviewAuthor("AuthorFirstName" + i + " AuthorLastName" + i); // Just a placeholder
+            bookReview.setReviewAuthorId((long) i+1); // Assuming author IDs start from 1
+            bookReview.setReviewContent("This is a review content for book ID " + ((long) i+1) + ". The book is really interesting and engaging. I would highly recommend it to others.");
+            bookReview.setReviewStatus((byte) (Math.random() * 3)); // Pending review
+            bookReview.setReviewTitle("Review Title " + i); // Placeholder title 
+            bookReview.setViews((int) (Math.random() * 30)); // Random views
+            bookReview.setUpdatedBy((long) i+1); // Assuming admin IDs start from 1
+            bookReview.setUpdatedTime(null); // No updates yet
+            bookReview.setIsDeleted((byte) 0); // Not deleted
+            // bookReview.setCreateTime(new Date()); // Current time
+            bookReview.setCreateTime(new Date(publishYear - 1900, (int)(Math.random() * 12), (int)(Math.random() * 28) + 1)); // Random date
 
+            bookReviewRepository.save(bookReview);
+        }
 
     }
 

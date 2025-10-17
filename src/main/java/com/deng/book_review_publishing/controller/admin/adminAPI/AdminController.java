@@ -28,6 +28,11 @@ public class AdminController {
         this.adminService = adminService;
     }
 
+    /**
+     * Get admin by id
+     * @param id the id of the admin to get
+     * @return ResponseEntity<?> with the admin or an error response
+     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getAdminById(@PathVariable Long id) {
         if (id <= 0) {
@@ -52,6 +57,12 @@ public class AdminController {
         }
     }
 
+    /**
+     * Update admin by id
+     * @param id the id of the admin to update
+     * @param admin the admin object with updated information
+     * @return ResponseEntity<?> with a success message or an error response
+     */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateAdmin(@PathVariable Long id, @RequestBody Admin admin) {
         if (id <= 0) {
@@ -75,7 +86,7 @@ public class AdminController {
             boolean isUpdated = adminService.update(id, admin);
             if (isUpdated) {
                 logger.info("Admin updated successfully with ID: {}", id);
-                return ResponseEntity.ok().build();
+                return ResponseEntity.ok(admin);
             }
             else {
                 logger.warn("Admin not found with ID: {}", id);
@@ -91,21 +102,26 @@ public class AdminController {
         }
     }
 
+    /**
+     * Update admin status by id
+     * @param id the id of the admin to update
+     * @param locked the new status of the admin (0 for active, 1 for locked)
+     * @return ResponseEntity<?> with a success message or an error response
+     */
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateAdminStatus(@PathVariable Long id, @RequestParam(defaultValue = "0") byte locked) {
-        if (id <= 0) {
-            logger.warn("Invalid admin ID provided: {}", id);
-            return ResponseEntity.badRequest()
-              .body(new ErrorResponse("Invalid admin ID", HttpStatus.BAD_REQUEST));
-        }
-        if (locked != 0 && locked != 1) {
-            logger.warn("Invalid admin status provided: {}", locked);
-            return ResponseEntity.badRequest()
-              .body(new ErrorResponse("Invalid admin status", HttpStatus.BAD_REQUEST));
-            
-        }
-
         try {
+            if (id <= 0) {
+                logger.warn("Invalid admin ID provided: {}", id);
+                return ResponseEntity.badRequest()
+                .body(new ErrorResponse("Invalid admin ID", HttpStatus.BAD_REQUEST));
+            }
+            if (locked != 0 && locked != 1) {
+                logger.warn("Invalid admin status provided: {}", locked);
+                return ResponseEntity.badRequest()
+                .body(new ErrorResponse("Invalid admin status", HttpStatus.BAD_REQUEST));
+                
+            }
             logger.debug("Updating admin status with ID: {}", id);
             Admin admin = adminService.findById(id);
             if (admin == null) {
@@ -122,7 +138,7 @@ public class AdminController {
             boolean isUpdated = adminService.updateAdminLockStatus(id, locked);
             if (isUpdated) {
                 logger.info("Admin status updated successfully with ID: {}", id);
-                return ResponseEntity.ok().build();
+                return ResponseEntity.ok(admin);
             }
             else {
                 logger.warn("Admin status update failed with ID: {}", id);

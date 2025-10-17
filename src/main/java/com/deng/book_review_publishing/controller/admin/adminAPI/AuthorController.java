@@ -37,6 +37,14 @@ public class AuthorController {
         this.authorService = authorService;
     }
 
+    /**
+     * Get all active authors with pagination and sorting
+     * @param pageNum
+     * @param pageSize
+     * @param sortField
+     * @param sortDirection
+     * @return ResponseEntity<?> with a page of active authors or an error response
+     */
     @GetMapping("/allActiveAuthors")
     public ResponseEntity<?> getAllActiveAuthors(
         @RequestParam(defaultValue = "0") int pageNum,
@@ -75,7 +83,15 @@ public class AuthorController {
                 .body(new ErrorResponse("Error fetching active authors", HttpStatus.INTERNAL_SERVER_ERROR));
         }
     }  
-    
+
+    /**
+     * Get all authors with pagination and sorting
+     * @param pageNum
+     * @param pageSize
+     * @param sortField
+     * @param sortDirection
+     * @return ResponseEntity<?> with a page of authors or an error response
+     */
     @GetMapping("/all")
     public ResponseEntity<?> getAllAuthors(
         @RequestParam(defaultValue = "0") int pageNum,
@@ -112,7 +128,21 @@ public class AuthorController {
         }
 
     }
-
+    
+    /**
+     * Get all authors with pagination and sorting by conditions
+     * @param pageNum
+     * @param pageSize
+     * @param sortField
+     * @param sortDirection
+     * @param firstName
+     * @param lastName
+     * @param countryName
+     * @param gender
+     * @param isDeleted
+     * @param authorStatus
+     * @return ResponseEntity<?> with a page of authors or an error response
+     */
     @GetMapping("/allByConditions")
     public ResponseEntity<?> getAllAuthorsByConditions(
         @RequestParam(defaultValue = "0") int pageNum,
@@ -122,13 +152,13 @@ public class AuthorController {
         @RequestParam(required = false) String firstName,
         @RequestParam(required = false) String lastName,
         @RequestParam(required = false) String countryName,
-        @RequestParam(required = false) Byte gender,
-        @RequestParam(required = false) Byte isDeleted,
-        @RequestParam(required = false) Byte authorStatus 
+        @RequestParam(required = false, defaultValue = "0") Byte authorGender,
+        @RequestParam(required = false, defaultValue = "0") Byte isDeleted,
+        @RequestParam(required = false, defaultValue = "0") Byte authorStatus 
     ){
         try {
             logger.debug("Fetching authors with conditions: pageNum: {}, pageSize: {}, sortField: {}, sortDirection: {}, firstName: {}, lastName: {}, countryName: {}, gender: {}, status: {}",
-                pageNum, pageSize, sortField, sortDirection, firstName, lastName, countryName, gender, isDeleted, authorStatus);
+                pageNum, pageSize, sortField, sortDirection, firstName, lastName, countryName, authorGender, isDeleted, authorStatus);
             // Validate pageNum and pageSize
             pageNum = ValidateUtil.validatePaginationParamPageNum(pageNum, 0);
             // Validate pageSize
@@ -139,7 +169,7 @@ public class AuthorController {
             sortDirection = ValidateUtil.validateAndNormalizeSortDirection(sortDirection);
             System.out.println("lastName: " + lastName);
 
-            Page<Author> authors = authorService.findAllByConditions(pageNum, pageSize, sortField, sortDirection, firstName, lastName, countryName, gender, isDeleted, authorStatus); 
+            Page<Author> authors = authorService.findAllByConditions(pageNum, pageSize, sortField, sortDirection, firstName, lastName, countryName, authorGender, isDeleted, authorStatus); 
             if (authors.isEmpty()) {
                 logger.info("No authors found with the given conditions");
                 return ResponseEntity.ok()
@@ -154,12 +184,17 @@ public class AuthorController {
               .body(new ErrorResponse("Error fetching authors", HttpStatus.INTERNAL_SERVER_ERROR)); 
         }
     }
-
+    
+    /**
+     * Get author by id
+     * @param id the id of the author to get
+     * @return ResponseEntity<?> with the author or an error response
+     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getAuthorById(@PathVariable Long id) {
         try {
             logger.debug("Fetching author with id: {}", id);
-            if (id == null) {
+            if (id == null ) {
                 logger.warn("Invalid author id provided");
                 return ResponseEntity.badRequest()
                    .body(new ErrorResponse("Invalid author id", HttpStatus.BAD_REQUEST));    
@@ -189,7 +224,7 @@ public class AuthorController {
     public ResponseEntity<?> updateIsDeletedById(@PathVariable Long id, @RequestParam(defaultValue = "0") Byte isDeleted) {
         try {
             logger.debug("Updating isDeleted status for author with id: {} to {}", id, isDeleted);
-            if (id == null) {
+            if (id <= 0) {
                 logger.warn("Invalid author id provided");
                 return ResponseEntity.badRequest()
                   .body(new ErrorResponse("Invalid author id", HttpStatus.BAD_REQUEST));    
@@ -222,7 +257,13 @@ public class AuthorController {
         }
         
     }
-
+    
+    /**
+     * Inactivate multiple authors by their IDs.
+     *
+     * @param ids The array of author IDs to inactivate.
+     * @return ResponseEntity with a success message or an error message.
+     */
     @PutMapping("/batch/inactive")
     public ResponseEntity<?> inactiveBatchByIds(@RequestBody Long[] ids) {
         try {
@@ -249,7 +290,13 @@ public class AuthorController {
                 .body(new ErrorResponse("Error inactivating authors", HttpStatus.INTERNAL_SERVER_ERROR));
         }
     }
-
+    
+    /**
+     * Add a new author.
+     *
+     * @param author The author object to add.
+     * @return ResponseEntity with the added author or an error message.
+     */
     @PostMapping("/addAuthor")
     public ResponseEntity<?> addAuthor(@RequestBody Author author) {
         try {
@@ -265,14 +312,8 @@ public class AuthorController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ErrorResponse("Failed to save author", HttpStatus.INTERNAL_SERVER_ERROR));
             }
-            Author savedAuthor = authorService.findById(author.getId());
-            if (savedAuthor == null) {
-                logger.warn("Saved author not found after saving: {}", author);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("Saved author not found", HttpStatus.NOT_FOUND));
-            }
-            logger.info("Author added successfully with id: {}", savedAuthor.getId());
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedAuthor);
+            logger.info("Author added successfully {}", author);
+            return ResponseEntity.status(HttpStatus.CREATED).body(author);
         } catch (Exception e) {
             logger.error("Error adding new author", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -280,6 +321,13 @@ public class AuthorController {
         }
     }
     
+    /**
+     * Update an existing author.
+     *
+     * @param id      The ID of the author to update.
+     * @param author  The author object with updated data.
+     * @return ResponseEntity with the updated author or an error message.
+     */
     @PutMapping("/updateAuthor/{id}")
     public ResponseEntity<?> updateAuthor(@PathVariable Long id, @RequestBody Author author) {
         try {
@@ -332,7 +380,11 @@ public class AuthorController {
 }
 
 
-
+/**
+ * PageResponse class to wrap paginated responses.
+ *
+ * @param <T> the type of elements in the page
+ */
 class PageResponse<T> {
     private final Page<T> data;
     private final String message;

@@ -279,7 +279,7 @@ public class BookReviewServiceImplTest {
         // Attempt to update a non-existing book review
         result = bookReviewService.updateBookReview(id, updatedBookReview);
 
-        BookReview bookReview = bookReviewService.finBookReviewById(id);
+        BookReview bookReview = bookReviewService.findBookReviewById(id);
 
         // Assert
         // assertNotNull(result);
@@ -302,7 +302,7 @@ public class BookReviewServiceImplTest {
         when(bookReviewRepository.findById(id)).thenReturn(Optional.of(bookReview));
 
         // Act
-        BookReview result = bookReviewService.finBookReviewById(id);
+        BookReview result = bookReviewService.findBookReviewById(id);
 
         // Assert
         assertNotNull(result);

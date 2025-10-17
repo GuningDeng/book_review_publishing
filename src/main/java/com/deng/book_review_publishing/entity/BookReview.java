@@ -25,7 +25,7 @@ public class BookReview {
     @Column(name = "book_review_title")
     private String reviewTitle;
     @Column(name = "book_review_views")
-    private int views;
+    private Integer views;
     @Column(name = "book_review_status")
     private byte reviewStatus;
     @Column(name = "book_review_is_deleted")
@@ -113,13 +113,13 @@ public class BookReview {
 
 
 
-    public int getViews() {
+    public Integer getViews() {
         return views;
     }
 
 
 
-    public void setViews(int views) {
+    public void setViews(Integer views) {
         this.views = views;
     }
 

@@ -57,8 +57,8 @@
                 <h4 class="mb-4 ps-3">Admin Dashboard</h4>
                 <nav class="nav flex-column">
                     <a class="nav-link" href="/admin/view/index"><i class="bi bi-speedometer2"></i> Dashboard</a>
-                    <a class="nav-link" href="#"><i class="bi bi-plus-circle"></i> Add Article</a>
-                    <a class="nav-link" href="#"><i class="bi bi-file-text"></i> Articles</a>
+                    <a class="nav-link" href="/admin/view/book/findBooksByFilters?pageNum=0&pageSize=10&sortField=id&sortDirection=asc"><i class="bi bi-plus-circle"></i> Add Book Review</a>
+                    <a class="nav-link" href="/admin/view/bookReview/bookReviewByFilters?pageNum=0&pageSize=10&sortField=id&sortDirection=asc"><i class="bi bi-file-text"></i> Book Reviews</a>
                     <a class="nav-link" href="/admin/view/book-genres/list"><i class="bi bi-list-ul"></i> Genres</a>
                     <a class="nav-link" href="/admin/view/book/findBooksByFilters?pageNum=0&pageSize=10&sortField=id&sortDirection=asc"><i class="bi bi-book"></i> Books</a>
                     <a class="nav-link active" href="/admin/view/author/add"><i class="bi bi-person-plus"></i> Add Author</a>
@@ -115,16 +115,10 @@
                         </div>
                         <div class="mb-3">
                             <label for="countryName" class="form-label">Country</label>
-                            <label for="countryName" class="form-label">Country</label>
-                            <label class="form-label" th:if="${#lists.isEmpty(countries)}">
-                                : (No countries found)
-                            </label>
                             <select class="form-select" id="countryName" name="countryName" required>
                                 <option value="">Select Country</option>
                                 <!-- Assuming Country enum values are passed from the controller -->
-                                <option th:each="country : ${countries}" 
-                                            th:value="${country.id}" 
-                                            th:text="${country.countryName.displayName}"></option>
+                                <option th:each="country : ${countries}" th:value="${country.countryName}" th:text="${country.countryName.displayName}"></option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -153,7 +147,10 @@
                                 </div>
                             </div>
                         </div>
-                        
+                        <div class="mb-3">
+                            <label for="createdByAdminId" class="form-label">Created By Admin ID</label>
+                            <input type="number" class="form-control" id="createdByAdminId" name="createdByAdminId" required>
+                        </div>
                         <button type="submit" class="btn btn-primary">Save Author</button>
                         <a href="/admin/view/author/allByConditions?pageNum=0&pageSize=10&sortField=id&sortDirection=asc" class="btn btn-secondary ms-2">Cancel</a>
                     </form>

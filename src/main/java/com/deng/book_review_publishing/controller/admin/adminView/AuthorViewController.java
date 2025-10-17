@@ -38,6 +38,21 @@ public class AuthorViewController {
         logger.debug("AuthorViewController initialized with services: {}, {}, {}, {}", bookService, authorService, bookGenreService, countryEntityService);
     }
 
+    /**
+     * Get all authors with conditions
+     * @param model
+     * @param pageNum
+     * @param pageSize
+     * @param sortField
+     * @param sortDirection
+     * @param firstName
+     * @param lastName
+     * @param countryName
+     * @param authorGender
+     * @param isDeleted 0 - not deleted, 1 - deleted
+     * @param authorStatus 0 - inactive, 1 - active
+     * @return
+     */
     @GetMapping("/allByConditions")
     public String getAllByConditions(
         Model model,
@@ -48,8 +63,8 @@ public class AuthorViewController {
         @RequestParam(required = false) String firstName,
         @RequestParam(required = false) String lastName,
         @RequestParam(required = false) String countryName,
-        @RequestParam(required = false) Byte gender,
-        @RequestParam(required = false) Byte isDeleted,
+        @RequestParam(required = false, defaultValue = "0") Byte authorGender,
+        @RequestParam(required = false, defaultValue = "0") Byte isDeleted,
         @RequestParam(required = false, defaultValue = "0") Byte authorStatus
     ){
 
@@ -60,16 +75,19 @@ public class AuthorViewController {
             sortField = ValidateUtil.validateAndNormalizeSortField(sortField,
                     new String[] { "id", "firstName", "lastName", "countryName" }, "id");
             sortDirection = ValidateUtil.validateAndNormalizeSortDirection(sortDirection);
+            logger.info("Validated pagination parameters: pageNum={}, pageSize={}, sortField={}, sortDirection={}", pageNum, pageSize, sortField, sortDirection);
+            
+
             
             long totalAuthors = authorService.count();
             
-            Page<Author> authors = authorService.findAllByConditions(pageNum, pageSize, sortField, sortDirection, firstName, lastName, countryName, gender, isDeleted, authorStatus);
+            Page<Author> authors = authorService.findAllByConditions(pageNum, pageSize, sortField, sortDirection, firstName, lastName, countryName, authorGender, isDeleted, authorStatus);
             long activeAuthors = authors.getTotalElements();
             long publishedBooks = bookService.findAllBooksByIsPublishedStatus(pageNum, pageSize, "id", sortDirection, (byte) 1).getTotalElements();
             long bookGenreCount = bookGenreService.countBookGenres();
             
             model.addAttribute("authors", authors);
-            model.addAttribute("authorPage", authors);
+            // model.addAttribute("authorPage", authors);
             model.addAttribute("currentPage", pageNum);
             model.addAttribute("pageSize", pageSize);
             model.addAttribute("sortField", sortField);
@@ -88,6 +106,12 @@ public class AuthorViewController {
             
     }
 
+    /**
+     * Get author by id
+     * @param model
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
     public String getAuthorById(Model model, @PathVariable Long id) {
         try {
@@ -111,7 +135,7 @@ public class AuthorViewController {
             else {
                 logger.info("Author not found");
                 model.addAttribute("authorExists", false);
-                return "admin/authors";
+                return "error";
             }
         } catch (Exception e) {
             logger.error("Error fetching author: {}", e.getMessage());

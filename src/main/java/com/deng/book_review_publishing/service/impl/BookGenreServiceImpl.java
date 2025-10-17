@@ -88,8 +88,19 @@ public class BookGenreServiceImpl implements BookGenreService {
                 
             }
             bookGenre.setIsDeleted(isDeleted);
-            bookGenreRepository.save(bookGenre);
-            return bookGenre.getIsDeleted() == isDeleted;
+            bookGenreRepository.save(bookGenre); // Save the updated book genre
+
+            // Refresh the entity from the database to get the latest state
+            BookGenre updatedBookGenre = bookGenreRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Book genre not found with ID: " + id));
+            
+            if (updatedBookGenre.getIsDeleted() != isDeleted) {
+                logger.warn("Book genre delete status update failed for ID: {}", id);
+                return false;
+            }   
+            logger.info("Book genre delete status set to {} for ID: {}", isDeleted, id);
+            
+            return updatedBookGenre.getIsDeleted() == isDeleted; // Return true if the update was successful
         } catch (Exception e) {
             logger.error("Error updating book genre delete status for ID: {}", id, e);
             return false;
